@@ -6,7 +6,7 @@ import org.openqa.selenium.WebDriver;
 /**
  * Created by patrick.mcparland on 22/12/2015.
  */
-public class SelectQuestion {
+public class SelectQuestion extends Question {
 
     /**
      * Select a dropdown value for a question

@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Created by patrick.mcparland on 22/12/2015.
  */
-public class NumericQuestion {
+public class NumericQuestion extends Question {
 
     /**
      * Enter numeric data for a question

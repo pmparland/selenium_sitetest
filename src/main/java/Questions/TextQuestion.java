@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Created by patrick.mcparland on 22/12/2015.
  */
-public class TextQuestion {
+public class TextQuestion extends Question {
 
     /**
      * Enter text for a question

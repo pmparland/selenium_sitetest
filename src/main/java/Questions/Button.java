@@ -6,7 +6,7 @@ import org.openqa.selenium.WebDriver;
 /**
  * Created by patrick.mcparland on 22/12/2015.
  */
-public class Button {
+public class Button extends Question {
 
     /**
      * Select a button
