@@ -4,6 +4,9 @@ package TestCases;
  * Created by patrick.mcparland on 23/12/2015.
  */
 
+import org.apache.log4j.Logger;
+
+
 /**
  * Defines the methods used to represent a test case
  */
@@ -19,6 +22,8 @@ public abstract class TestCase {
      *      the result of the test.
      */
     abstract public Boolean execute ();
+
+    static final Logger logger = Logger.getLogger(TestCase.class);
 
     /**
      * get the name of the test

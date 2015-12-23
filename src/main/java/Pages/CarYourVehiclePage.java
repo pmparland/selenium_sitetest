@@ -1,5 +1,6 @@
 package Pages;
 
+import Questions.Question;
 import org.openqa.selenium.WebDriver;
 
 
@@ -16,23 +17,28 @@ public class CarYourVehiclePage extends Page {
      *      the current web driver.
      */
     public static void submitSimpleData (WebDriver driver){
+        logger.info(">>> submitSimpleData");
+
+
         // Go to first questions page
         driver.get(ADDRESS);
 
-        Questions.TextQuestion.enterText(driver, "vehicle_registration_number", "EXI5697");
-        Questions.Button.selectButton(driver, "Find");
+        Question q = new Question(driver);
+
+        q.enterText("vehicle_registration_number", "EXI5697");
+        q.selectButton("Find");
         // Todo need to find some way to select when multiple vehicles returned
-        Questions.SelectQuestion.makeSelection(driver, "vehicle_kept", "D");            //On a private driveway
-        Questions.SelectQuestion.makeSelection(driver, "vehicle_kept_day", "W");        //Work place car park
-        Questions.SelectQuestion.makeSelection(driver, "vehicle_bought_yyyy", "2015");  //2015
-        Questions.SelectQuestion.makeSelection(driver, "vehicle_bought_mm", "01");      //January
-        Questions.NumericQuestion.enterNumber(driver, "estimated_value", "4003");
-        Questions.Button.selectButtonByXPath(driver, "//input[@name='vehicle_alarm' and @value='Y']");
-        Questions.Button.selectButtonByXPath(driver, "//input[@name='vehicle_immobiliser' and @value='Y']");
-        Questions.Button.selectButtonByXPath(driver, "//input[@name='vehicle_tracking_device' and @value='Y']");
-        Questions.SelectQuestion.makeSelection(driver, "vehicle_grey_or_import", "N");      //No
-        Questions.Button.selectButtonByXPath(driver, "//input[@name='vehicle_modified_from_manufacturer' and @value='N']");
-        Questions.SelectQuestion.makeSelection(driver, "seats_of_vehicle", "5");            //5
+        q.makeSelection("vehicle_kept", "D");            //On a private driveway
+        q.makeSelection("vehicle_kept_day", "W");        //Work place car park
+        q.makeSelection("vehicle_bought_yyyy", "2015");  //2015
+        q.makeSelection("vehicle_bought_mm", "01");      //January
+        q.enterNumber("estimated_value", "4003");
+        q.selectButtonByXPath("//input[@name='vehicle_alarm' and @value='Y']");
+        q.selectButtonByXPath("//input[@name='vehicle_immobiliser' and @value='Y']");
+        q.selectButtonByXPath("//input[@name='vehicle_tracking_device' and @value='Y']");
+        q.makeSelection("vehicle_grey_or_import", "N");      //No
+        q.selectButtonByXPath("//input[@name='vehicle_modified_from_manufacturer' and @value='N']");
+        q.makeSelection("seats_of_vehicle", "5");            //5
 
     }
 

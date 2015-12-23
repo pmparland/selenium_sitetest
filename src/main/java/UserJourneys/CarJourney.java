@@ -14,6 +14,8 @@ public class CarJourney extends Journey {
      *      the current web driver.
      */
     public static void simpleCarJourney (WebDriver driver) {
+        logger.info(">>> simpleCarJourney");
+
         CarYourVehiclePage yourVehiclePage = new CarYourVehiclePage();
         yourVehiclePage.submitSimpleData(driver);
     }
