@@ -1,4 +1,4 @@
-package ObjectMapRepo;
+package QuestionMapRepo;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,8 +29,9 @@ public class ObjectMapLoginTest {
 
         //Get current working directory
         String workingDir=System.getProperty("user.dir");
+        System.out.println(workingDir);
         //Get object map file
-        objmap = new ObjectMap (workingDir+"\\src\\main\\resources\\objectmap.properties");
+        objmap = new ObjectMap (workingDir+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"main"+System.getProperty("file.separator")+"resources"+System.getProperty("file.separator")+ "objectmap.properties");
         //Get the username element
         WebElement username = driver.findElement(objmap.getLocator("Username_field"));
         username.sendKeys("test");
