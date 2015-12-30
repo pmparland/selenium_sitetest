@@ -23,7 +23,9 @@ Production deployment as Docker Container
 
     To package as a Docker container use mvn clean package docker:build
 
-    To use Chrome ensure that you Install Chrome Web Driver
+    To use Chrome ensure that you Install Chrome Web Driver - https://code.google.com/p/selenium/wiki/ChromeDriver
+    To use IE ensure that you install the IE Web Driver - https://code.google.com/p/selenium/wiki/InternetExplorerDriver
+    By defualt Firefox is supported
 
 Who do I talk to?
 --------------
