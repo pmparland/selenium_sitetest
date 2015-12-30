@@ -1,4 +1,3 @@
-
 Selenium Test
 ==============
 
@@ -24,37 +23,10 @@ Production deployment as Docker Container
 
     To package as a Docker container use mvn clean package docker:build
 
+    To use Chrome ensure that you Install Chrome Web Driver
+
 Who do I talk to?
 --------------
 
     Repo owner or admin
     Other community or team contact
-
-
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
