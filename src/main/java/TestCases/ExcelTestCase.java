@@ -1,49 +1,95 @@
 package TestCases;
 
-import QuestionMapRepo.QuestionMap;
-import UserJourneys.CarJourney;
+import Questions.QuestionList;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 
 /**
  * Created by patrick.mcparland on 23/12/2015.
  */
+
+/**
+ * A test case which excepts an Excel file and places the answers for each question on the correct page
+ */
 public class ExcelTestCase extends TestCase {
 
-    static String ADDRESS = "https://car-insurance.quotezone.co.uk/car/index.php?page=1";
-
-
-    public  Boolean execute() throws  Exception {
+    /**
+     * Execute the questions in an excel file against a give web address
+     * @param excelFile
+     *       the name and path of the excel file in a string
+     * @param address
+     *       the web page address
+     * @param browser
+     *       the browser to be used, Firefox, chrome or IE
+     * @return Boolean
+     *      test pass or fail.
+     */
+    public  Boolean execute(String excelFile, String address, String browser) throws  Exception {
         logger.info(">>> execute ExcelTestCase");
 
-        //Get current working directory
-        String workingDir=System.getProperty("user.dir");
-        String testData = workingDir+System.getProperty("file.separator")+"src"+System.getProperty("file.separator")+"main"+System.getProperty("file.separator")+"resources"+System.getProperty("file.separator")+ "objectmap.properties";
-        //Get object map file
-        logger.info(">>> load file:" + testData);
-        WebDriver page = new FirefoxDriver();
-        QuestionMap objmap = new QuestionMap(page, testData);
+        //Set browser
+        WebDriver page;
+        if (browser.equalsIgnoreCase("chrome")){
+            setBrowser("Chrome");
+            page = new ChromeDriver();
+        }
+        else if (browser.equalsIgnoreCase("FireFox")){
+            setBrowser("FireFox");
+            page = new FirefoxDriver();
+        }
+        else if (browser.equals("IE")){
+            setBrowser("IE");
+            page=new InternetExplorerDriver();
+        }
+        else {
+            setResult(Boolean.FALSE);
+            throw new Exception("Browser '" + browser + "' not found!!");
+        }
 
-        // Go to first questions page
-        page.get(ADDRESS);
-
-        //Start test
-        setName("ExcelTestCase");
-        setBrowser("FireFox");
-        CarJourney journey = new CarJourney();
-        objmap.populateQuestions();
+        executeQuestions(page, excelFile, address);
 
         return getResult();
     }
-    public static void main(String[] args) throws Exception {
-        Boolean res = false;
-        ExcelTestCase tc = new ExcelTestCase();
-        res = tc.execute();
-        if (res) {
-            logger.info("Test case: " + tc.getName() + "Passed");
-        }
-        else {
-            logger.info("Test case: " + tc.getName() + "Failed" );
-        }
+
+    /**
+     * Execute the questions in an excel file against a give web address - defaults to firefox
+     * @param excelFile
+     *       the name and path of the excel file in a string
+     * @param address
+     *       the web page address
+     * @return Boolean
+     *      test pass or fail.
+     */
+    public  Boolean execute(String excelFile, String address) throws  Exception {
+        logger.info(">>> execute ExcelTestCase");
+
+        //Set browser
+        setBrowser("FireFox");
+        WebDriver page = new FirefoxDriver();
+
+        executeQuestions(page, excelFile, address);
+
+        return getResult();
     }
+
+    private void executeQuestions (WebDriver page, String excelFile, String address) throws Exception {
+        logger.info(">>> execute executeQuestions");
+
+        //Get questions
+        QuestionList qList = new QuestionList(excelFile);
+
+        // Go to first question page
+        page.get(address);
+        Thread.sleep(3000);
+
+        //Start test
+        setName("ExcelTestCase");
+        qList.questions.stream().forEach((question -> {
+            if (!question.executeQuestion(page)) setResult(Boolean.FALSE);
+        }));
+
+    }
+
 }

@@ -1,90 +1,177 @@
 package Questions;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.formula.eval.StringEval;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by patrick.mcparland on 23/12/2015.
+ */
+
+/**
+ * Defines the set of data to answer a question
  */
 public class Question {
 
     static final Logger logger = Logger.getLogger(Question.class);
 
-    private static WebDriver page;
+    private String locatorType;  // How to locate the element, e.g. name
+    private String locatorValue; //Data to use with the locator type
+    private String inputType;    // The type of input for this question, e.g. text
+    private String inputValue;   // The value that goesd with this input type
 
-    public Question (WebDriver driver) {
-        page = driver;
+    /**
+     * Creates a question
+     * @return question
+     *      an empty question.
+     */
+    public Question() {
     }
 
     /**
-     * Select a button
-     * @param linkText
-     *      the button name as it appears in the html.
+     * Get the string representation of a question
+     * @return string
+     *      the string
      */
-    public Question  selectButton(String linkText) {
-        logger.info(">>> selectButton");
-
-        page.findElement(By.linkText(linkText)).click();
-        return this;
-
+    public String toString() {
+        return String.format("%s - %s - %s - %s", locatorType, locatorValue, inputType, inputValue);
     }
 
     /**
-     * Select a button.
-     * @param xPath
-     *      the xPath to the button.
+     * Set the locator type such as name or linktext
+     * @param type
+     *      the type of the locator
      */
-    public Question selectButtonByXPath(String xPath) {
-        logger.info(">>> selectButtonByXPath");
-
-        page.findElement(By.xpath(xPath)).click();
-        return this;
+    public void setLocatorType(String type){
+        locatorType = type;
     }
 
     /**
-     * Enter numeric data for a question
-     * @param questionName
-     *      the question Name as it appears in the html.
-     * @param number
-     *      the number to be inserted for that question.
+     * Set the locator value such as text
+     * @param val
+     *      the value for the locator
      */
-    public  Question enterNumber(String questionName, String number) {
-        logger.info(">>> enterNumber");
-
-        WebElement question = page.findElement(By.name(questionName));
-        question.sendKeys(number);
-        return this;
+    public void setLocatorValue(String val){
+        locatorValue = val;
     }
 
     /**
-     * Select a dropdown value for a question
-     * @param selectName
-     *      the selectName Name as it appears in the html.
-     * @param selectValue
-     *      the selectValue to be selected for that question as it appears in the html option value
+     * Set the input type such as select
+     * @param type
+     *      the type of the input
      */
-    public  Question makeSelection(String selectName, String selectValue) {
-        logger.info(">>> makeSelection");
-
-        org.openqa.selenium.support.ui.Select dropDown = new org.openqa.selenium.support.ui.Select(page.findElement(By.name(selectName)));
-        dropDown.selectByValue(selectValue);
-        return this;
+    public void setInputType(String type){
+        inputType = type;
     }
 
     /**
-     * Enter text for a question
-     * @param questionName
-     *      the question Name as it appears in the html.
-     * @param text
-     *      the text to be inserted for that question.
+     * Set the value of the input type such as a select value
+     * @param val
+     *      the value
      */
-    public Question enterText(String questionName, String text) {
-        logger.info(">>> makeSelection");
-
-        WebElement question = page.findElement(By.name(questionName));
-        question.sendKeys(text);
-        return this;
+    public void setInputValue (String val){
+        inputValue = val;
     }
+
+    /**
+     * Execute a question by finding its location on the page and applying the input
+     * @param page
+     *      the web page
+     * @return the question
+     */
+    public Boolean executeQuestion(WebDriver page){
+        logger.info(">>> executeQuestion " + locatorValue);
+
+        //Ignore empty rows
+        if (locatorType == null || locatorType.isEmpty()) return Boolean.TRUE;
+
+        try {
+            By element = getLocator();
+            applyInput(page, element);
+            return Boolean.TRUE;
+        } catch (Exception e) {logger.error(e.getMessage());}
+        return Boolean.FALSE;
+    }
+
+    /**
+     * Get the location of the question
+     * @return element
+     *      the element on the page
+     */
+    private By getLocator() throws Exception {
+        logger.info(">>> getLocator");
+
+        //Get an instance of By class based on type of locator
+        By element;
+        if (locatorType.toLowerCase().equals("id"))
+            element = By.id(locatorValue);
+        else if (locatorType.equalsIgnoreCase("name"))
+            element = By.name(locatorValue);
+        else if ((locatorType.equalsIgnoreCase("classname")) || (locatorType.toLowerCase().equals("class")))
+            element = By.className(locatorValue);
+        else if ((locatorType.equalsIgnoreCase("tagname")) || (locatorType.toLowerCase().equals("tag")))
+            element = By.className(locatorValue);
+        else if ((locatorType.equalsIgnoreCase("linktext")) || (locatorType.toLowerCase().equals("link")))
+            element = By.linkText(locatorValue);
+        else if (locatorType.equalsIgnoreCase("partiallinktext"))
+            element = By.partialLinkText(locatorValue);
+        else if ((locatorType.equalsIgnoreCase("cssselector")) || (locatorType.toLowerCase().equals("css")))
+            element = By.cssSelector(locatorValue);
+        else if (locatorType.equalsIgnoreCase("xpath"))
+            element = By.xpath(locatorValue);
+        else
+            throw new Exception("Locator type '" + locatorType + "' not defined!!");
+        return element;
+    }
+
+    /**
+     * Insert or the select the input
+     * @param page
+     *      the web page
+     * @param element
+     *      the element representing the location of the question
+     *           * @return the question
+     */
+    private void applyInput (WebDriver page, By element) throws Exception {
+        logger.info(">>> applyInput: " + inputValue);
+
+        // Get an instance of input type
+        if(inputType.equalsIgnoreCase("text"))
+            page.findElement(element).sendKeys(inputValue);
+        else if (inputType.equalsIgnoreCase("button")){
+            page.findElement(element).click();
+            Thread.sleep(500); //Wait after a button press
+        }
+        else if (inputType.equalsIgnoreCase("select")) {
+            Select dropDown = new Select(page.findElement(element));
+            dropDown.selectByValue(inputValue);
+        }
+        else if (inputType.equalsIgnoreCase("hidden_select")) {
+            Select dropDown = new Select(page.findElement(element));
+            dropDown.selectByIndex(Integer.parseInt(inputValue));
+        }
+        else if (inputType.equalsIgnoreCase("number"))
+            page.findElement(element).sendKeys(inputValue);
+        else
+            throw new Exception("Input type '" + inputType + "' not defined!!");
+    }
+
+
 }

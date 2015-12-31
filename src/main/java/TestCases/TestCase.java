@@ -14,14 +14,8 @@ public abstract class TestCase {
 
     private String name;
     private String browser;
-    private Boolean result = false;
+    private Boolean result = true;
 
-    /**
-     * execvute the test case
-     * @return  result
-     *      the result of the test.
-     */
-    abstract public Boolean execute ();
 
     static final Logger logger = Logger.getLogger(TestCase.class);
 
@@ -33,9 +27,16 @@ public abstract class TestCase {
     public String getName () {
         return name;
     }
+
+    /**
+     * Set the test name
+     * @param name
+     *      the test name
+     */
     public void setName (String n) {
         name = n;
     }
+
     /**
      * get the browser of the test
      * @return  browser
@@ -44,6 +45,12 @@ public abstract class TestCase {
     public String getBrowser (){
         return browser;
     }
+
+    /**
+     * Set the browser name
+     * @param browser
+     *      the browser type
+     */
     public void setBrowser (String b){
         browser =b;
     }
@@ -55,6 +62,12 @@ public abstract class TestCase {
     public Boolean getResult (){
         return result;
     }
+
+    /**
+     * Set the result pass or fail
+     * @param r
+     *      the Boolean result
+     */
     public void setResult (Boolean r){
         result = r;
     }
