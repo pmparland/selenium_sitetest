@@ -9,10 +9,14 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -150,7 +154,7 @@ public class Question {
      *           * @return the question
      */
     private void applyInput (WebDriver page, By element) throws Exception {
-        logger.info(">>> applyInput: " + inputValue);
+        logger.info(">>> applyInput: " + inputValue + " to " + locatorValue);
 
         // Get an instance of input type
         if(inputType.equalsIgnoreCase("text"))
@@ -163,9 +167,24 @@ public class Question {
             Select dropDown = new Select(page.findElement(element));
             dropDown.selectByValue(inputValue);
         }
-        else if (inputType.equalsIgnoreCase("hidden_select")) {
+        else if (inputType.equalsIgnoreCase("select_by_index")) {
             Select dropDown = new Select(page.findElement(element));
             dropDown.selectByIndex(Integer.parseInt(inputValue));
+        }
+        else if (inputType.equalsIgnoreCase("hidden_select")) {
+            logger.info("hidden_select");
+            Actions action = new Actions(page);
+            WebElement we = page.findElement(element);
+            action.moveToElement(we).perform();
+            /*
+            WebElement el = page.findElement(element*
+            JavascriptExecutor js = (JavascriptExecutor)page;
+            String arguments = "document.getElementsByName(" + "'" + locatorValue + "'" + ")[0].style.visibility='visible';";
+            js.executeScript(arguments, el);
+            Select dropDown = new Select(el);
+            WebDriverWait wait = new WebDriverWait(page,300);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(element));
+            dropDown.selectByIndex(Integer.parseInt(inputValue));*/
         }
         else if (inputType.equalsIgnoreCase("number"))
             page.findElement(element).sendKeys(inputValue);
