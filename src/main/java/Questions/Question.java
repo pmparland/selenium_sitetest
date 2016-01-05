@@ -1,29 +1,11 @@
 package Questions;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.formula.eval.StringEval;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.pagefactory.ElementLocator;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by patrick.mcparland on 23/12/2015.
@@ -101,7 +83,7 @@ public class Question {
      * @return the question
      */
     public Boolean executeQuestion(WebDriver page){
-        logger.info(">>> executeQuestion " + locatorValue);
+        logger.info(">>> executeQuestion " + locatorValue );
 
         //Ignore empty rows
         if (locatorType == null || locatorType.isEmpty()) return Boolean.TRUE;
@@ -124,19 +106,19 @@ public class Question {
 
         //Get an instance of By class based on type of locator
         By element;
-        if (locatorType.toLowerCase().equals("id"))
+        if (locatorType.equalsIgnoreCase("id"))
             element = By.id(locatorValue);
         else if (locatorType.equalsIgnoreCase("name"))
             element = By.name(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("classname")) || (locatorType.toLowerCase().equals("class")))
+        else if ((locatorType.equalsIgnoreCase("classname")) || (locatorType.equalsIgnoreCase("class")))
             element = By.className(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("tagname")) || (locatorType.toLowerCase().equals("tag")))
+        else if ((locatorType.equalsIgnoreCase("tagname")) || (locatorType.equalsIgnoreCase("tag")))
             element = By.className(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("linktext")) || (locatorType.toLowerCase().equals("link")))
+        else if ((locatorType.equalsIgnoreCase("linktext")) || (locatorType.equalsIgnoreCase("link")))
             element = By.linkText(locatorValue);
         else if (locatorType.equalsIgnoreCase("partiallinktext"))
             element = By.partialLinkText(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("cssselector")) || (locatorType.toLowerCase().equals("css")))
+        else if ((locatorType.equalsIgnoreCase("cssselector")) || (locatorType.equalsIgnoreCase("css")))
             element = By.cssSelector(locatorValue);
         else if (locatorType.equalsIgnoreCase("xpath"))
             element = By.xpath(locatorValue);
@@ -163,9 +145,13 @@ public class Question {
             page.findElement(element).click();
             Thread.sleep(500); //Wait after a button press
         }
-        else if (inputType.equalsIgnoreCase("select")) {
+        else if (inputType.equalsIgnoreCase("select_by_value")) {
             Select dropDown = new Select(page.findElement(element));
             dropDown.selectByValue(inputValue);
+        }
+        else if (inputType.equalsIgnoreCase("select_by_text")) {
+            Select dropDown = new Select(page.findElement(element));
+            dropDown.selectByVisibleText(inputValue);
         }
         else if (inputType.equalsIgnoreCase("select_by_index")) {
             Select dropDown = new Select(page.findElement(element));

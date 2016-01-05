@@ -73,7 +73,7 @@ public class QuestionList {
             while (cellIterator.hasNext()) {
                 Cell nextCell = cellIterator.next();
                 int columnIndex = nextCell.getColumnIndex();
-
+                //Ignore column zero
                 switch (columnIndex) {
                     case 1:
                         aQuestion.setLocatorType(df.formatCellValue(nextCell));
