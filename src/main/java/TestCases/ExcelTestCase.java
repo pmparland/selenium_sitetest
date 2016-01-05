@@ -6,6 +6,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by patrick.mcparland on 23/12/2015.
  */
@@ -82,12 +84,15 @@ public class ExcelTestCase extends TestCase {
 
         // Go to first question page
         page.get(address);
-        Thread.sleep(3000);
+        // Wait for first page to load - up to 10 seconds
+        page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
         //Start test
         setName("ExcelTestCase");
         qList.questions.stream().forEach((question -> {
-            if (!question.executeQuestion(page)) setResult(Boolean.FALSE);
+            if (!question.executeQuestion(page)) {
+                setResult(Boolean.FALSE);
+            }
         }));
 
     }

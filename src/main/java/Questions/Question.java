@@ -2,10 +2,14 @@ package Questions;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by patrick.mcparland on 23/12/2015.
@@ -21,7 +25,9 @@ public class Question {
     private String locatorType;  // How to locate the element, e.g. name
     private String locatorValue; //Data to use with the locator type
     private String inputType;    // The type of input for this question, e.g. text
-    private String inputValue;   // The value that goesd with this input type
+    private String inputValue;   // The value that goes with this input type
+    private String expectedResultOperator;    // TThe operator to use to check the expected result
+    private String expectedResultValue;   // The value that goes with this expected result
 
     /**
      * Creates a question
@@ -37,7 +43,7 @@ public class Question {
      *      the string
      */
     public String toString() {
-        return String.format("%s - %s - %s - %s", locatorType, locatorValue, inputType, inputValue);
+        return String.format("%s - %s - %s - %s - %s - %s", locatorType, locatorValue, inputType, inputValue, expectedResultOperator, expectedResultValue);
     }
 
     /**
@@ -77,6 +83,24 @@ public class Question {
     }
 
     /**
+     * Set the expected result operator type
+     * @param op
+     *      the operator to use on the expected result such as contains
+     */
+    public void setExpectedResultOperator(String op){
+        expectedResultOperator = op;
+    }
+
+    /**
+     * Set the expected result value
+     * @param val
+     *      the value for the expected result
+     */
+    public void setExpectedResultValue(String val){
+        expectedResultValue = val;
+    }
+
+    /**
      * Execute a question by finding its location on the page and applying the input
      * @param page
      *      the web page
@@ -91,6 +115,8 @@ public class Question {
         try {
             By element = getLocator();
             applyInput(page, element);
+            if(expectedResultOperator != null && !expectedResultOperator.isEmpty())
+                return processExpectedResultOperator(page);
             return Boolean.TRUE;
         } catch (Exception e) {logger.error(e.getMessage());}
         return Boolean.FALSE;
@@ -138,12 +164,23 @@ public class Question {
     private void applyInput (WebDriver page, By element) throws Exception {
         logger.info(">>> applyInput: " + inputValue + " to " + locatorValue);
 
+        //Wait for the presence of the element
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(page)
+                .withTimeout(10, TimeUnit.SECONDS)
+                .pollingEvery(250, TimeUnit.MILLISECONDS)
+                .ignoring(NoSuchElementException.class);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(element));
+
         // Get an instance of input type
         if(inputType.equalsIgnoreCase("text"))
             page.findElement(element).sendKeys(inputValue);
         else if (inputType.equalsIgnoreCase("button")){
             page.findElement(element).click();
-            Thread.sleep(500); //Wait after a button press
+            if (locatorType.equalsIgnoreCase("nextButton"))
+                //Wait longer for a page change
+                page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+            else
+               Thread.sleep(500); //Wait after a button press
         }
         else if (inputType.equalsIgnoreCase("select_by_value")) {
             Select dropDown = new Select(page.findElement(element));
@@ -157,26 +194,31 @@ public class Question {
             Select dropDown = new Select(page.findElement(element));
             dropDown.selectByIndex(Integer.parseInt(inputValue));
         }
-        else if (inputType.equalsIgnoreCase("hidden_select")) {
-            logger.info("hidden_select");
-            Actions action = new Actions(page);
-            WebElement we = page.findElement(element);
-            action.moveToElement(we).perform();
-            /*
-            WebElement el = page.findElement(element*
-            JavascriptExecutor js = (JavascriptExecutor)page;
-            String arguments = "document.getElementsByName(" + "'" + locatorValue + "'" + ")[0].style.visibility='visible';";
-            js.executeScript(arguments, el);
-            Select dropDown = new Select(el);
-            WebDriverWait wait = new WebDriverWait(page,300);
-            wait.until(ExpectedConditions.visibilityOfElementLocated(element));
-            dropDown.selectByIndex(Integer.parseInt(inputValue));*/
-        }
         else if (inputType.equalsIgnoreCase("number"))
             page.findElement(element).sendKeys(inputValue);
         else
             throw new Exception("Input type '" + inputType + "' not defined!!");
     }
 
+    /**
+     * Get the location of the question
+     * @return element
+     *      the element on the page
+     */
+    private Boolean processExpectedResultOperator(WebDriver page) throws Exception{
+        logger.info(">>> getExpectedResultOperator " + expectedResultOperator);
+        Boolean result;
+        if (expectedResultOperator.equalsIgnoreCase("contains")){
+            if(page.getPageSource().contains(expectedResultValue))
+                result =  Boolean.TRUE;
+            else
+                result =  Boolean.FALSE;
+        }
+        else
+            throw new Exception("Expected Result Operator '" + expectedResultOperator + "' not defined!!");
+        if (!result)
+            logger.info(">>> getExpectedResultOperator " + expectedResultOperator + " failed!");
+        return result;
+    }
 
 }

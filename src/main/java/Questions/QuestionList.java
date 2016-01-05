@@ -87,6 +87,12 @@ public class QuestionList {
                     case 4:
                         aQuestion.setInputValue(df.formatCellValue(nextCell));
                         break;
+                    case 5:
+                        aQuestion.setExpectedResultOperator(df.formatCellValue(nextCell));
+                        break;
+                    case 6:
+                        aQuestion.setExpectedResultValue(df.formatCellValue(nextCell));
+                        break;
                 }
             }
             listQuestions.add(aQuestion);
