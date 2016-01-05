@@ -1,4 +1,4 @@
-package TestCases;
+package com.seopa.tests.automated.test.cases;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

@@ -1,4 +1,4 @@
-package Questions;
+package com.seopa.tests.automated.questions;
 
 import lombok.Data;
 import org.openqa.selenium.By;

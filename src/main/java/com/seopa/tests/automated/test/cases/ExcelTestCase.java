@@ -1,7 +1,7 @@
-package TestCases;
+package com.seopa.tests.automated.test.cases;
 
-import Questions.ExcelQuestionList;
-import Questions.Question;
+import com.seopa.tests.automated.questions.ExcelQuestionList;
+import com.seopa.tests.automated.questions.Question;
 
 import java.util.List;
 
