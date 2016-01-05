@@ -79,9 +79,9 @@ public abstract class TestCase {
         // Wait for page to load
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
-        questionList.stream().forEach((question -> {
-            question.executeQuestion(driver);
-        }));
+        questionList.stream().filter((question ->
+            question.executeQuestion(driver)
+        )).findFirst();
     }
 
     public void setBrowser(String browser) {

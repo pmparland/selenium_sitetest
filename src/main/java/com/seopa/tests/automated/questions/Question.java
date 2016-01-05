@@ -60,16 +60,25 @@ public class Question {
      * Execute a question by finding its location on the page and applying the input
      *
      * @param   page The driver for the web page to test.
+     * @return  <code>true</code> has been returned if this Question can be executed, otherwise <code>false</code>
+     *          has been returned.
      */
-    public void executeQuestion(WebDriver page) {
+    public boolean executeQuestion(WebDriver page)  {
         // Ignore empty rows
-        if (!isExecutable()) {return ;}
+        if (!isExecutable()) {return false;}
 
         // Answer the Question
         applyInput(page);
 
         // Check expect result
-        //processExpectedResultOperator(page);
+        boolean result;
+        try {
+            result = processExpectedResultOperator(page);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            result = false;
+        }
+        return result;
     }
 
 
@@ -117,15 +126,15 @@ public class Question {
      * @return element
      *      the element on the page
      */
-    private Boolean processExpectedResultOperator(WebDriver page) throws Exception {
+    private boolean processExpectedResultOperator(WebDriver page) throws Exception {
         log.info(">>> processExpectedResultOperator " + expectedResultOperator + " using " + expectedResultValue);
 
         Boolean result;
         if (expectedResultOperator.equalsIgnoreCase("contains")) {
             if (page.getPageSource().contains(expectedResultValue))
-                result = Boolean.TRUE;
+                result = true;
             else
-                result = Boolean.FALSE;
+                result = false;
         } else
             throw new Exception("Expected Result Operator '" + expectedResultOperator + "' not defined!!");
         return result;
