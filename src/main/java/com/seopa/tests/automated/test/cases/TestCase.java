@@ -80,7 +80,7 @@ public abstract class TestCase {
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
         questionList.stream().filter((question ->
-            question.executeQuestion(driver)
+            !question.executeQuestion(driver)
         )).findFirst();
     }
 

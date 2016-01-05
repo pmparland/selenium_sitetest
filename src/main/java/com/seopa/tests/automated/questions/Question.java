@@ -57,6 +57,15 @@ public class Question {
 
 
     /**
+     * Determines if the Question has an expected result
+     *
+     * @return  <code>true</code> if the question has a defined operator for expectred result
+     */
+    public boolean hasExpectedResult() {
+        return !(null == expectedResultOperator || expectedResultOperator.isEmpty());
+    }
+
+    /**
      * Execute a question by finding its location on the page and applying the input
      *
      * @param   page The driver for the web page to test.
@@ -64,25 +73,27 @@ public class Question {
      *          has been returned.
      */
     public boolean executeQuestion(WebDriver page)  {
+        boolean result = true;
+
         // Ignore empty rows
-        if (!isExecutable()) {return false;}
-
-        // Answer the Question
-        applyInput(page);
-
-        // Check expect result
-        boolean result;
+        if (!isExecutable()) {result = true;}
         try {
-            result = processExpectedResultOperator(page);
-        } catch (Exception e) {
+            // Answer the Question
+            applyInput(page);
+
+            // Check expect result
+            if (hasExpectedResult()) {
+                result = processExpectedResultOperator(page);
+            }
+        }
+        catch (Exception e) {
             log.error(e.getMessage());
-            result = false;
         }
         return result;
     }
 
 
-    private By getLocator() {
+    private By getLocator() throws Exception {
         log.info(">>> getLocator " + locatorType + " using " + locatorValue);
 
         // Get an instance of By class based on the type of locator
@@ -121,26 +132,23 @@ public class Question {
     }
 
 
-    /**
-     * Get the location of the question
-     * @return element
-     *      the element on the page
-     */
     private boolean processExpectedResultOperator(WebDriver page) throws Exception {
         log.info(">>> processExpectedResultOperator " + expectedResultOperator + " using " + expectedResultValue);
 
         Boolean result;
-        if (expectedResultOperator.equalsIgnoreCase("contains")) {
-            if (page.getPageSource().contains(expectedResultValue))
+        switch (expectedResultOperator.toLowerCase()) {
+            case "contains" :
+                page.getPageSource().contains(expectedResultValue);
                 result = true;
-            else
+                break;
+            default :
                 result = false;
-        } else
-            throw new Exception("Expected Result Operator '" + expectedResultOperator + "' not defined!!");
+                throw new Exception("Expected Result Operator '" + expectedResultOperator + "' not defined!!");
+        }
         return result;
     }
 
-    private void applyInput (WebDriver page) {
+    private void applyInput (WebDriver page) throws Exception {
         log.info(">>> applyInput " + inputType + " using " + inputValue);
 
         // Get an instance of input type
@@ -151,9 +159,12 @@ public class Question {
                 break;
             case "button" :
                 page.findElement(element).click();
-                if (locatorType.equalsIgnoreCase("nextButton"))
+                if (locatorType.equalsIgnoreCase("nextButton")){
                     //Wait longer for a page change
+                    log.info("Before page wait");
                     page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+                    log.info("After page wait");
+                }
                 else {
                     // Wait after a button press
                     try {
