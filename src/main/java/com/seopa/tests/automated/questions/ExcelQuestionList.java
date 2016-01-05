@@ -103,4 +103,7 @@ public class ExcelQuestionList {
         return listQuestions;
     }
 
+    public List<Question> getQuestions() {
+        return questions;
+    }
 }

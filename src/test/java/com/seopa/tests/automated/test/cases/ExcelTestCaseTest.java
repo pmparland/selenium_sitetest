@@ -32,7 +32,7 @@ public class ExcelTestCaseTest {
         //Get current working directory
         String workingDir=System.getProperty("user.dir");
         String separator = System.getProperty("file.separator");
-        String excelFile = workingDir+separator+"src"+separator+"test"+separator+"java"+separator+ "TestCases" + separator + "SimpleCarJourney01.xlsx";
+        String excelFile = workingDir+separator+"src"+separator+"test"+separator+"java"+separator+ "com" + separator +"seopa"+separator+"tests"+separator+"automated"+separator+"test"+separator+"cases"+separator+ "SimpleCarJourney01.xlsx";
 
         ExcelTestCase test = new ExcelTestCase();
 

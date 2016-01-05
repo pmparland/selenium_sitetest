@@ -8,6 +8,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Defines the methods used to represent a test case.
@@ -19,8 +20,12 @@ public abstract class TestCase {
 
     private String browser;
     private Boolean result = true;
+    private String name;
+
 
     // TODO Pat - Need something for device
+
+
 
     /**
      * Loads the list of questions from the source specified in the child test case.
@@ -71,14 +76,31 @@ public abstract class TestCase {
         // Go to first question page
         WebDriver driver = createWebDriver();
         driver.get(startingAddress);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // Wait for page to load
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
         questionList.stream().forEach((question -> {
             question.executeQuestion(driver);
         }));
+    }
+
+    public void setBrowser(String browser) {
+        this.browser = browser;
+    }
+
+    public Boolean getResult() {
+        return result;
+    }
+
+    public void setResult(Boolean result) {
+        this.result = result;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

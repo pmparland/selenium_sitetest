@@ -2,16 +2,12 @@ package com.seopa.tests.automated.test.cases;
 
 import com.seopa.tests.automated.questions.ExcelQuestionList;
 import com.seopa.tests.automated.questions.Question;
-
-<<<<<<< HEAD
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import java.util.List;
 
 /**
  * Created by patrick.mcparland on 23/12/2015.
  */
-=======
-import java.util.List;
->>>>>>> 140b33d9f958ff3df832f4f773f071c5bdc5c89a
 
 /**
  * A test case which excepts an Excel file and places the answers for each question on the correct page.
@@ -20,8 +16,11 @@ import java.util.List;
  */
 public class ExcelTestCase extends TestCase {
 
+    private static org.apache.log4j.Logger log = Logger.getLogger(ExcelTestCase.class);
+
     private String excelFileName;
     private String address;
+
 
     /**
      * Execute the questions in an excel file against a give web address.
@@ -34,7 +33,7 @@ public class ExcelTestCase extends TestCase {
      *          will have been thrown by the component that failed.
      */
     public boolean execute(String excelFile, String address, String browser) throws Exception {
-
+        log.info(">>> execute " + excelFile);
         setBrowser(browser);
         this.address = address;
         this.excelFileName = excelFile;
@@ -53,6 +52,7 @@ public class ExcelTestCase extends TestCase {
      *          will have been thrown by the component that failed.
      */
     public boolean execute(String excelFile, String address) throws  Exception {
+        log.info(">>> execute " + excelFile);
 
         setBrowser("firefox");
         this.address = address;
@@ -62,34 +62,11 @@ public class ExcelTestCase extends TestCase {
         return true;
     }
 
-<<<<<<< HEAD
-    private void executeQuestions (WebDriver page, String excelFile, String address) throws Exception {
-        logger.info(">>> execute executeQuestions");
 
-        //Get questions
-        QuestionList qList = new QuestionList(excelFile);
-
-        // Go to first question page
-        page.get(address);
-        // Wait for first page to load - up to 10 seconds
-        page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-
-        //Start test
-        setName("ExcelTestCase");
-        qList.questions.stream().forEach((question -> {
-            if (!question.executeQuestion(page)) {
-                setResult(Boolean.FALSE);
-            }
-        }));
-
-=======
-    @Override
     protected List<Question> loadQuestions() {
         return new ExcelQuestionList(excelFileName).getQuestions();
->>>>>>> 140b33d9f958ff3df832f4f773f071c5bdc5c89a
     }
 
-    @Override
     protected String determineStartingAddress() {
         return address;
     }
