@@ -27,6 +27,8 @@ Production deployment as Docker Container
     To use IE ensure that you install the IE Web Driver - https://code.google.com/p/selenium/wiki/InternetExplorerDriver
     By default Firefox is supported. This Firefox addon is extremely useful https://addons.mozilla.org/en-GB/firefox/addon/element-locator-for-webdriv/ 
 
+    Test can only be executed from a Seopa ip!
+
 Who do I talk to?
 --------------
 
