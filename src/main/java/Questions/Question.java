@@ -1,177 +1,125 @@
 package Questions;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.Logger;
-import org.apache.poi.ss.formula.eval.StringEval;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import lombok.Data;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
+ * Defines the set of data to answer a question.
+ *
  * Created by patrick.mcparland on 23/12/2015.
  */
-
-/**
- * Defines the set of data to answer a question
- */
+@Data
 public class Question {
 
-    static final Logger logger = Logger.getLogger(Question.class);
-
     private String locatorType;  // How to locate the element, e.g. name
-    private String locatorValue; //Data to use with the locator type
+    private String locatorValue; // Data to use with the locator type
     private String inputType;    // The type of input for this question, e.g. text
-    private String inputValue;   // The value that goesd with this input type
+    private String inputValue;   // The value that goes with this input type
 
     /**
-     * Creates a question
-     * @return question
-     *      an empty question.
+     * Determines if the Question is executable based on whether or not the sufficient parameters
+     * have been set.
+     *
+     * @return  <code>true</code> has been returned if this Question can be executed, otherwise <code>false</code>
+     *          has been returned.
      */
-    public Question() {
-    }
-
-    /**
-     * Get the string representation of a question
-     * @return string
-     *      the string
-     */
-    public String toString() {
-        return String.format("%s - %s - %s - %s", locatorType, locatorValue, inputType, inputValue);
-    }
-
-    /**
-     * Set the locator type such as name or linktext
-     * @param type
-     *      the type of the locator
-     */
-    public void setLocatorType(String type){
-        locatorType = type;
-    }
-
-    /**
-     * Set the locator value such as text
-     * @param val
-     *      the value for the locator
-     */
-    public void setLocatorValue(String val){
-        locatorValue = val;
-    }
-
-    /**
-     * Set the input type such as select
-     * @param type
-     *      the type of the input
-     */
-    public void setInputType(String type){
-        inputType = type;
-    }
-
-    /**
-     * Set the value of the input type such as a select value
-     * @param val
-     *      the value
-     */
-    public void setInputValue (String val){
-        inputValue = val;
+    public boolean isExecutable() {
+        return !(null == locatorType || locatorType.isEmpty());
     }
 
     /**
      * Execute a question by finding its location on the page and applying the input
-     * @param page
-     *      the web page
-     * @return the question
+     *
+     * @param   page The driver for the web page to test.
      */
-    public Boolean executeQuestion(WebDriver page){
-        logger.info(">>> executeQuestion " + locatorValue);
+    public void executeQuestion(WebDriver page) {
+        // Ignore empty rows
+        if (!isExecutable()) {return ;}
 
-        //Ignore empty rows
-        if (locatorType == null || locatorType.isEmpty()) return Boolean.TRUE;
-
-        try {
-            By element = getLocator();
-            applyInput(page, element);
-            return Boolean.TRUE;
-        } catch (Exception e) {logger.error(e.getMessage());}
-        return Boolean.FALSE;
+        // Answer the Question
+        applyInput(page);
     }
 
     /**
-     * Get the location of the question
-     * @return element
-     *      the element on the page
+     * Get the location of the question.
+     *
+     * @return  The location of the element representing this Question.
      */
-    private By getLocator() throws Exception {
-        logger.info(">>> getLocator");
+    private By getLocator() {
 
-        //Get an instance of By class based on type of locator
-        By element;
-        if (locatorType.toLowerCase().equals("id"))
-            element = By.id(locatorValue);
-        else if (locatorType.equalsIgnoreCase("name"))
-            element = By.name(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("classname")) || (locatorType.toLowerCase().equals("class")))
-            element = By.className(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("tagname")) || (locatorType.toLowerCase().equals("tag")))
-            element = By.className(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("linktext")) || (locatorType.toLowerCase().equals("link")))
-            element = By.linkText(locatorValue);
-        else if (locatorType.equalsIgnoreCase("partiallinktext"))
-            element = By.partialLinkText(locatorValue);
-        else if ((locatorType.equalsIgnoreCase("cssselector")) || (locatorType.toLowerCase().equals("css")))
-            element = By.cssSelector(locatorValue);
-        else if (locatorType.equalsIgnoreCase("xpath"))
-            element = By.xpath(locatorValue);
-        else
-            throw new Exception("Locator type '" + locatorType + "' not defined!!");
+        // Get an instance of By class based on the type of locator
+        By element = null;
+        switch (locatorType.toLowerCase()) {
+            case "id" :
+                element = By.id(locatorValue);
+                break;
+            case "name" :
+                element = By.name(locatorValue);
+                break;
+            case "classname" :
+            case "class" :
+            case "tagname" :
+            case "tag" :
+                element = By.className(locatorValue);
+                break;
+            case "linktext" :
+            case "link":
+                element = By.linkText(locatorValue);
+                break;
+            case "partiallinktext" :
+                element = By.partialLinkText(locatorValue);
+                break;
+            case "cssselector" :
+            case "css" :
+                element = By.cssSelector(locatorValue);
+                break;
+            case "xpath" :
+                element = By.xpath(locatorValue);
+                break;
+            default :
+                throw new RuntimeException("Locator Type [" + locatorType + "] not defined");
+        }
         return element;
+
     }
 
     /**
-     * Insert or the select the input
-     * @param page
-     *      the web page
-     * @param element
-     *      the element representing the location of the question
-     *           * @return the question
+     * Insert or the select the input.
+     *
+     * @param   page The driver for the web page to test.
      */
-    private void applyInput (WebDriver page, By element) throws Exception {
-        logger.info(">>> applyInput: " + inputValue);
+    private void applyInput (WebDriver page) {
 
         // Get an instance of input type
-        if(inputType.equalsIgnoreCase("text"))
-            page.findElement(element).sendKeys(inputValue);
-        else if (inputType.equalsIgnoreCase("button")){
-            page.findElement(element).click();
-            Thread.sleep(500); //Wait after a button press
+        By element = getLocator();
+        switch (inputType.toLowerCase()) {
+            case "text" :
+                page.findElement(element).sendKeys(inputValue);
+                break;
+            case "button" :
+                page.findElement(element).click();
+                // Wait after a button press
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            case "select" :
+                Select dropDown = new Select(page.findElement(element));
+                dropDown.selectByValue(inputValue);
+                break;
+            case "hidden_select" :
+                Select hiddenDropDown = new Select(page.findElement(element));
+                hiddenDropDown.selectByIndex(Integer.parseInt(inputValue));
+                break;
+            case "number" :
+                page.findElement(element).sendKeys(inputValue);
+            default :
+                throw new RuntimeException("Input type [" + inputType + "] not defined");
         }
-        else if (inputType.equalsIgnoreCase("select")) {
-            Select dropDown = new Select(page.findElement(element));
-            dropDown.selectByValue(inputValue);
-        }
-        else if (inputType.equalsIgnoreCase("hidden_select")) {
-            Select dropDown = new Select(page.findElement(element));
-            dropDown.selectByIndex(Integer.parseInt(inputValue));
-        }
-        else if (inputType.equalsIgnoreCase("number"))
-            page.findElement(element).sendKeys(inputValue);
-        else
-            throw new Exception("Input type '" + inputType + "' not defined!!");
-    }
 
+    }
 
 }

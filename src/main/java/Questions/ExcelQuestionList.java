@@ -1,7 +1,11 @@
 package Questions;
 
-import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.*;
+import lombok.Getter;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -12,47 +16,41 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Defines a list of questions to be applied.
+ *
  * Created by patrickmcparland on 29/12/2015.
  */
+public class ExcelQuestionList {
 
-/**
- * Defines a list of questions to be applied
- */
-public class QuestionList {
-    static final Logger logger = Logger.getLogger(QuestionList.class);
-
-    public List <Question> questions = new ArrayList<>();;
+    @Getter
+    private List <Question> questions = new ArrayList<>();
 
     /**
-     * Create a question list from an Excel file
-     * @param excelFile
-     *       the name and path of the excel file in a string
-     * @return QuestionList
-     *      the list of questions in the file
+     * Create a question list from an Excel file.
+     *
+     * @param   excelFile The name and path of the excel file in a string.
+     *
+     * @return  ExcelQuestionList The list of questions in the file.
      */
-    public QuestionList(String excelFile){
+    public ExcelQuestionList(String excelFile) {
         try {
             questions = readQuestionDataFromExcelFile(excelFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        catch (IOException e) { logger.error(e.getMessage()); }
 
     }
 
-
-    private Object getCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_STRING:
-                return cell.getStringCellValue();
-
-            case Cell.CELL_TYPE_BOOLEAN:
-                return cell.getBooleanCellValue();
-
-            case Cell.CELL_TYPE_NUMERIC:
-                return cell.getNumericCellValue();
-        }
-        return null;
-    }
-
+    /**
+     * Reads the question data from the file.
+     *
+     * @param   filename The fully qualified name of the file to read.
+     *
+     * @return  A non-null reference to the list of Questions that has been read from the file has been
+     *          returned.
+     *
+     * @throws  IOException Raised if there is an issue reading from the file.
+     */
     private List<Question> readQuestionDataFromExcelFile(String filename) throws IOException {
         List<Question> listQuestions = new ArrayList<>();
         FileInputStream inputStream = new FileInputStream(new File(filename));
@@ -60,9 +58,9 @@ public class QuestionList {
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet firstSheet = workbook.getSheetAt(0);
         Iterator<Row> iterator = firstSheet.iterator();
-        DataFormatter df = new DataFormatter(); //Used to store excel values as they appear
+        DataFormatter df = new DataFormatter(); // Used to store excel values as they appear
 
-        //Ignore header first row
+        // Ignore header first row
         Row first = iterator.next();
 
         while (iterator.hasNext()) {
@@ -72,20 +70,21 @@ public class QuestionList {
 
             while (cellIterator.hasNext()) {
                 Cell nextCell = cellIterator.next();
+                String value = df.formatCellValue(nextCell);
                 int columnIndex = nextCell.getColumnIndex();
 
                 switch (columnIndex) {
                     case 1:
-                        aQuestion.setLocatorType(df.formatCellValue(nextCell));
+                        aQuestion.setLocatorType(value);
                         break;
                     case 2:
-                        aQuestion.setLocatorValue(df.formatCellValue(nextCell));
+                        aQuestion.setLocatorValue(value);
                         break;
                     case 3:
-                        aQuestion.setInputType(df.formatCellValue(nextCell));
+                        aQuestion.setInputType(value);
                         break;
                     case 4:
-                        aQuestion.setInputValue(df.formatCellValue(nextCell));
+                        aQuestion.setInputValue(value);
                         break;
                 }
             }
@@ -97,7 +96,5 @@ public class QuestionList {
 
         return listQuestions;
     }
-
-
 
 }

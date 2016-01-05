@@ -1,95 +1,66 @@
 package TestCases;
 
-import Questions.QuestionList;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
+import Questions.ExcelQuestionList;
+import Questions.Question;
+
+import java.util.List;
 
 /**
+ * A test case which excepts an Excel file and places the answers for each question on the correct page.
+ *
  * Created by patrick.mcparland on 23/12/2015.
- */
-
-/**
- * A test case which excepts an Excel file and places the answers for each question on the correct page
  */
 public class ExcelTestCase extends TestCase {
 
+    private String excelFileName;
+    private String address;
+
     /**
-     * Execute the questions in an excel file against a give web address
-     * @param excelFile
-     *       the name and path of the excel file in a string
-     * @param address
-     *       the web page address
-     * @param browser
-     *       the browser to be used, Firefox, chrome or IE
-     * @return Boolean
-     *      test pass or fail.
+     * Execute the questions in an excel file against a give web address.
+     *
+     * @param   excelFile The name and path of the excel file in a string.
+     * @param   address The web page address.
+     * @param   browser The browser to be used, Firefox, chrome or IE.
+     *
+     * @return  <code>true</code> has been returned if the TestCase executed successfully, otherwise an Exception
+     *          will have been thrown by the component that failed.
      */
-    public  Boolean execute(String excelFile, String address, String browser) throws  Exception {
-        logger.info(">>> execute ExcelTestCase");
+    public boolean execute(String excelFile, String address, String browser) throws Exception {
 
-        //Set browser
-        WebDriver page;
-        if (browser.equalsIgnoreCase("chrome")){
-            setBrowser("Chrome");
-            page = new ChromeDriver();
-        }
-        else if (browser.equalsIgnoreCase("FireFox")){
-            setBrowser("FireFox");
-            page = new FirefoxDriver();
-        }
-        else if (browser.equals("IE")){
-            setBrowser("IE");
-            page=new InternetExplorerDriver();
-        }
-        else {
-            setResult(Boolean.FALSE);
-            throw new Exception("Browser '" + browser + "' not found!!");
-        }
+        setBrowser(browser);
+        this.address = address;
+        this.excelFileName = excelFile;
 
-        executeQuestions(page, excelFile, address);
-
-        return getResult();
+        executeTests();
+        return true;
     }
 
     /**
-     * Execute the questions in an excel file against a give web address - defaults to firefox
-     * @param excelFile
-     *       the name and path of the excel file in a string
-     * @param address
-     *       the web page address
-     * @return Boolean
-     *      test pass or fail.
+     * Execute the questions in an excel file against a give web address - defaults to firefox.
+     *
+     * @param   excelFile The name and path of the excel file in a string.
+     * @param   address The web page address.
+     *
+     * @return  <code>true</code> has been returned if the TestCase executed successfully, otherwise an Exception
+     *          will have been thrown by the component that failed.
      */
-    public  Boolean execute(String excelFile, String address) throws  Exception {
-        logger.info(">>> execute ExcelTestCase");
+    public boolean execute(String excelFile, String address) throws  Exception {
 
-        //Set browser
-        setBrowser("FireFox");
-        WebDriver page = new FirefoxDriver();
+        setBrowser("firefox");
+        this.address = address;
+        this.excelFileName = excelFile;
 
-        executeQuestions(page, excelFile, address);
-
-        return getResult();
+        executeTests();
+        return true;
     }
 
-    private void executeQuestions (WebDriver page, String excelFile, String address) throws Exception {
-        logger.info(">>> execute executeQuestions");
-
-        //Get questions
-        QuestionList qList = new QuestionList(excelFile);
-
-        // Go to first question page
-        page.get(address);
-        Thread.sleep(3000);
-
-        //Start test
-        setName("ExcelTestCase");
-        qList.questions.stream().forEach((question -> {
-            if (!question.executeQuestion(page)) setResult(Boolean.FALSE);
-        }));
-
+    @Override
+    protected List<Question> loadQuestions() {
+        return new ExcelQuestionList(excelFileName).getQuestions();
     }
 
+    @Override
+    protected String determineStartingAddress() {
+        return address;
+    }
 }
