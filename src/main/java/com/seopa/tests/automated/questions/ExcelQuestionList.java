@@ -1,4 +1,4 @@
-package Questions;
+package com.seopa.tests.automated.questions;
 
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;

@@ -1,4 +1,4 @@
-package Questions;
+package com.seopa.tests.automated.questions;
 
 <<<<<<< HEAD
 import org.apache.log4j.Logger;
