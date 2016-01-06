@@ -7,6 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -68,8 +69,8 @@ public abstract class TestCase {
     /**
      * Executes the tests.
      */
-    public void executeTests() {
-
+    public boolean executeTests() {
+        boolean res=true;
         List<Question> questionList = loadQuestions();
         String startingAddress = determineStartingAddress();
 
@@ -79,9 +80,12 @@ public abstract class TestCase {
         // Wait for page to load
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
-        questionList.stream().filter((question ->
-            !question.executeQuestion(driver)
-        )).findFirst();
+        Iterator qIterator = questionList.iterator();
+        while (res && qIterator.hasNext()){
+            Question q = (Question) qIterator.next();
+            res=q.executeQuestion(driver);
+        }
+        return  res;
     }
 
     public void setBrowser(String browser) {

@@ -3,8 +3,12 @@ package com.seopa.tests.automated.questions;
 import lombok.Data;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.util.concurrent.TimeUnit;
 
@@ -77,17 +81,20 @@ public class Question {
 
         // Ignore empty rows
         if (!isExecutable()) {result = true;}
-        try {
-            // Answer the Question
-            applyInput(page);
+        else {
+            try {
+                // Answer the Question
+                applyInput(page);
 
-            // Check expect result
-            if (hasExpectedResult()) {
-                result = processExpectedResultOperator(page);
+                // Check expect result
+                if (hasExpectedResult()) {
+                    result = processExpectedResultOperator(page);
+                }
             }
-        }
-        catch (Exception e) {
-            log.error(e.getMessage());
+            catch (Exception e) {
+                log.error(e.getMessage());
+                System.exit(0);
+            }
         }
         return result;
     }
@@ -138,13 +145,16 @@ public class Question {
         Boolean result;
         switch (expectedResultOperator.toLowerCase()) {
             case "contains" :
-                page.getPageSource().contains(expectedResultValue);
-                result = true;
+                result = page.getPageSource().contains(expectedResultValue);
                 break;
             default :
                 result = false;
                 throw new Exception("Expected Result Operator '" + expectedResultOperator + "' not defined!!");
         }
+        if (!result)
+            log.error("Question expected result failed using operator " + expectedResultOperator + " with " + expectedResultValue);
+        else
+            log.info("Question expected result passed using operator " + expectedResultOperator + " with " + expectedResultValue);
         return result;
     }
 
@@ -153,25 +163,25 @@ public class Question {
 
         // Get an instance of input type
         By element = getLocator();
+
+        //Wait for it to be visible
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(page)
+                .withTimeout(10, TimeUnit.SECONDS)
+                .pollingEvery(500, TimeUnit.MILLISECONDS)
+                .ignoring(NoSuchElementException.class);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(element));
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+
         switch (inputType.toLowerCase()) {
             case "text" :
                 page.findElement(element).sendKeys(inputValue);
                 break;
             case "button" :
                 page.findElement(element).click();
-                if (locatorType.equalsIgnoreCase("nextButton")){
+                if (locatorValue.equalsIgnoreCase("nextButton")){
                     //Wait longer for a page change
-                    log.info("Before page wait");
+                    log.info(">>> Next page");
                     page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-                    log.info("After page wait");
-                }
-                else {
-                    // Wait after a button press
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
                 break;
             case "select_by_value" :

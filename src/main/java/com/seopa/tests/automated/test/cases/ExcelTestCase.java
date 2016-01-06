@@ -38,8 +38,7 @@ public class ExcelTestCase extends TestCase {
         this.address = address;
         this.excelFileName = excelFile;
 
-        executeTests();
-        return true;
+        return executeTests();
     }
 
     /**
@@ -58,8 +57,7 @@ public class ExcelTestCase extends TestCase {
         this.address = address;
         this.excelFileName = excelFile;
 
-        executeTests();
-        return true;
+        return executeTests();
     }
 
 
