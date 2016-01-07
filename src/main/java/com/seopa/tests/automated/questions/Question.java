@@ -2,15 +2,11 @@ package com.seopa.tests.automated.questions;
 
 import lombok.Data;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 /**
  * Defines the set of data to answer a question.
@@ -162,22 +158,18 @@ public class Question {
         log.info(">>> applyInput " + inputType + " using " + inputValue);
 
         // Get an instance of input type
-        By element = getLocator();
+        By loc = getLocator();
+        waitForElementToBeAvailable(page, loc);
 
-        //Wait for it to be visible
-        Wait<WebDriver> wait = new FluentWait<WebDriver>(page)
-                .withTimeout(10, TimeUnit.SECONDS)
-                .pollingEvery(500, TimeUnit.MILLISECONDS)
-                .ignoring(NoSuchElementException.class);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(element));
-        wait.until(ExpectedConditions.elementToBeClickable(element));
-
+        //Get the element
+        WebElement element = page.findElement(loc);
         switch (inputType.toLowerCase()) {
             case "text" :
-                page.findElement(element).sendKeys(inputValue);
+                element.sendKeys(inputValue);
                 break;
             case "button" :
-                page.findElement(element).click();
+                scrollToElement(page, element);  //required if screen scrolls
+                element.click();
                 if (locatorValue.equalsIgnoreCase("nextButton")){
                     //Wait longer for a page change
                     log.info(">>> Next page");
@@ -185,28 +177,67 @@ public class Question {
                 }
                 break;
             case "select_by_value" :
-                Select dropDown = new Select(page.findElement(element));
+                Select dropDown = new Select(element);
+                scrollToElement(page, element);  //required if screen scrolls
+                waitForDropListToBeAvailable(page, dropDown);
                 dropDown.selectByValue(inputValue);
                 break;
             case "select_by_text" :
-                Select textDropDown = new Select(page.findElement(element));
+                Select textDropDown = new Select(element);
+                scrollToElement(page, element);  //required if screen scrolls
+                waitForDropListToBeAvailable(page, textDropDown);
                 textDropDown.selectByVisibleText(inputValue);
                 break;
             case "select_by_index" :
-                Select indexDropDown = new Select(page.findElement(element));
+                Select indexDropDown = new Select(element);
+                scrollToElement(page, element);  //required if screen scrolls
+                waitForDropListToBeAvailable(page, indexDropDown);
                 indexDropDown.selectByIndex(Integer.parseInt(inputValue));
                 break;
             case "hidden_select" :
-                Select hiddenDropDown = new Select(page.findElement(element));
+                Select hiddenDropDown = new Select(element);
+                scrollToElement(page, element);  //required if screen scrolls
                 hiddenDropDown.selectByIndex(Integer.parseInt(inputValue));
                 break;
             case "number" :
-                page.findElement(element).sendKeys(inputValue);
+                element.sendKeys(inputValue);
                 break;
             default :
                 throw new RuntimeException("Input type [" + inputType + "] not defined");
         }
     }
+
+    private void scrollToElement(WebDriver driver, WebElement el){
+        // Create instance of Javascript executor
+        JavascriptExecutor je = (JavascriptExecutor) driver;
+        // now execute query which actually will scroll until that element is not appeared on page.
+        je.executeScript("arguments[0].scrollIntoView(true);", el);
+    }
+
+    private void waitForElementToBeAvailable(WebDriver driver, By loc){
+        //Wait for it to be visible
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                .withTimeout(10, TimeUnit.SECONDS)
+                .pollingEvery(500, TimeUnit.MILLISECONDS)
+                .ignoring(NoSuchElementException.class);
+        wait.until(ExpectedConditions.presenceOfElementLocated(loc));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loc));
+        wait.until(ExpectedConditions.elementToBeClickable(loc));
+    }
+
+    private void waitForDropListToBeAvailable(WebDriver driver, Select sel){
+        //Wait for it to be visible
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                .withTimeout(10, TimeUnit.SECONDS)
+                .pollingEvery(500, TimeUnit.MILLISECONDS)
+                .ignoring(NoSuchElementException.class);
+        wait.until(new ExpectedCondition<Object>() {
+            public Boolean apply(WebDriver d) {
+                return (sel.getOptions().size()>1);
+            }
+        });
+    }
+
 
     public void setLocatorType(String locatorType) {
         this.locatorType = locatorType;
