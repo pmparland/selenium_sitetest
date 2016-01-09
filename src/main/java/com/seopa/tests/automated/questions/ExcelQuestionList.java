@@ -72,8 +72,10 @@ public class ExcelQuestionList {
                 Cell nextCell = cellIterator.next();
                 String value = df.formatCellValue(nextCell);
                 int columnIndex = nextCell.getColumnIndex();
-                //Ignore column zero
                 switch (columnIndex) {
+                    case 0:
+                        aQuestion.setqName(value);
+                        break;
                     case 1:
                         aQuestion.setLocatorType(value);
                         break;

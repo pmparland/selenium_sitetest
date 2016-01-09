@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit;
 @Data
 public abstract class TestCase {
 
-    private static org.apache.log4j.Logger log = Logger.getLogger(TestCase.class);
-
-
     private String browser;
     private Boolean result = true;
     private String name;

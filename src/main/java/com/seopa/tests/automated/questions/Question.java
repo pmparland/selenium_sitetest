@@ -18,6 +18,7 @@ public class Question {
 
     private static org.apache.log4j.Logger log = Logger.getLogger(Question.class);
 
+    private String qName;
     private String locatorType;  // How to locate the element, e.g. name
     private String locatorValue; // Data to use with the locator type
     private String inputType;    // The type of input for this question, e.g. text
@@ -73,6 +74,7 @@ public class Question {
      *          has been returned.
      */
     public boolean executeQuestion(WebDriver page)  {
+        log.info("Executing question "+ qName);
         boolean result = true;
 
         // Ignore empty rows
@@ -88,7 +90,7 @@ public class Question {
                 }
             }
             catch (Exception e) {
-                log.error(e.getMessage());
+                log.error("Failed at Question " + qName + "with error " +e.getMessage());
                 System.exit(0);
             }
         }
@@ -97,7 +99,6 @@ public class Question {
 
 
     private By getLocator() throws Exception {
-        log.info(">>> getLocator " + locatorType + " using " + locatorValue);
 
         // Get an instance of By class based on the type of locator
         By element;
@@ -136,7 +137,6 @@ public class Question {
 
 
     private boolean processExpectedResultOperator(WebDriver page) throws Exception {
-        log.info(">>> processExpectedResultOperator " + expectedResultOperator + " using " + expectedResultValue);
 
         Boolean result;
         switch (expectedResultOperator.toLowerCase()) {
@@ -155,7 +155,6 @@ public class Question {
     }
 
     private void applyInput (WebDriver page) throws Exception {
-        log.info(">>> applyInput " + inputType + " using " + inputValue);
 
         // Get an instance of input type
         By loc = getLocator();
@@ -212,7 +211,7 @@ public class Question {
     private void waitForElementToBeAvailable(WebDriver driver, By loc){
         //Wait for it to be visible
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-                .withTimeout(10, TimeUnit.SECONDS)
+                .withTimeout(15, TimeUnit.SECONDS)
                 .pollingEvery(500, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
         //Only one of these conditions will cause a wait but different elements have different properties
@@ -257,5 +256,13 @@ public class Question {
 
     public void setExpectedResultValue(String expectedResultValue) {
         this.expectedResultValue = expectedResultValue;
+    }
+
+    public String getqName() {
+        return qName;
+    }
+
+    public void setqName(String qName) {
+        this.qName = qName;
     }
 }
