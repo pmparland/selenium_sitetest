@@ -100,7 +100,7 @@ public class Question {
         log.info(">>> getLocator " + locatorType + " using " + locatorValue);
 
         // Get an instance of By class based on the type of locator
-        By element = null;
+        By element;
         switch (locatorType.toLowerCase()) {
             case "id" :
                 element = By.id(locatorValue);
@@ -194,11 +194,6 @@ public class Question {
                 waitForDropListToBeAvailable(page, indexDropDown);
                 indexDropDown.selectByIndex(Integer.parseInt(inputValue));
                 break;
-            case "hidden_select" :
-                Select hiddenDropDown = new Select(element);
-                scrollToElement(page, element);  //required if screen scrolls
-                hiddenDropDown.selectByIndex(Integer.parseInt(inputValue));
-                break;
             case "number" :
                 element.sendKeys(inputValue);
                 break;
@@ -210,7 +205,7 @@ public class Question {
     private void scrollToElement(WebDriver driver, WebElement el){
         // Create instance of Javascript executor
         JavascriptExecutor je = (JavascriptExecutor) driver;
-        // now execute query which actually will scroll until that element is not appeared on page.
+        // now execute query which actually will scroll until that element appears on the page.
         je.executeScript("arguments[0].scrollIntoView(true);", el);
     }
 
@@ -220,13 +215,14 @@ public class Question {
                 .withTimeout(10, TimeUnit.SECONDS)
                 .pollingEvery(500, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
+        //Only one of these conditions will cause a wait but different elements have different properties
         wait.until(ExpectedConditions.presenceOfElementLocated(loc));
         wait.until(ExpectedConditions.visibilityOfElementLocated(loc));
         wait.until(ExpectedConditions.elementToBeClickable(loc));
     }
 
     private void waitForDropListToBeAvailable(WebDriver driver, Select sel){
-        //Wait for it to be visible
+        //Wait for the Select Drop values to be visible
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                 .withTimeout(10, TimeUnit.SECONDS)
                 .pollingEvery(500, TimeUnit.MILLISECONDS)

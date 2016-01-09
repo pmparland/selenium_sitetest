@@ -2,6 +2,7 @@ package com.seopa.tests.automated.test.cases;
 
 import com.seopa.tests.automated.questions.Question;
 import lombok.Data;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -9,6 +10,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,6 +20,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Data
 public abstract class TestCase {
+
+    private static org.apache.log4j.Logger log = Logger.getLogger(TestCase.class);
+
 
     private String browser;
     private Boolean result = true;
@@ -48,7 +53,7 @@ public abstract class TestCase {
      * @return  If <code>browser</code> has been set to a recognised value for the available browsers then a
      *          new instance of the appropriate <code>WebDriver</code> has been returned.
      */
-    private WebDriver createWebDriver() {
+    private WebDriver createWebDriver() throws Exception{
         WebDriver driver = null;
         switch (browser.toLowerCase()) {
             case "chrome" :
@@ -69,7 +74,7 @@ public abstract class TestCase {
     /**
      * Executes the tests.
      */
-    public boolean executeTests() {
+    public boolean executeTests() throws Exception{
         boolean res=true;
         List<Question> questionList = loadQuestions();
         String startingAddress = determineStartingAddress();
@@ -80,11 +85,11 @@ public abstract class TestCase {
         // Wait for page to load
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 
-        Iterator qIterator = questionList.iterator();
-        while (res && qIterator.hasNext()){
-            Question q = (Question) qIterator.next();
-            res=q.executeQuestion(driver);
-        }
+
+        //Execute each question
+        Optional<Question> questionOptional =
+                questionList.stream().filter(obj -> !obj.executeQuestion(driver)).findFirst();
+
         return  res;
     }
 

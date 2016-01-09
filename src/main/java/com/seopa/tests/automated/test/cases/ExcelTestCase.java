@@ -37,6 +37,7 @@ public class ExcelTestCase extends TestCase {
         setBrowser(browser);
         this.address = address;
         this.excelFileName = excelFile;
+        setName(excelFile);
 
         return executeTests();
     }
@@ -56,6 +57,7 @@ public class ExcelTestCase extends TestCase {
         setBrowser("firefox");
         this.address = address;
         this.excelFileName = excelFile;
+        setName(excelFile);
 
         return executeTests();
     }
