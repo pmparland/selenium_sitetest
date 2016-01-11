@@ -9,9 +9,7 @@ Development
 
     Checkout the sources
     Build and run using mvn clean install
-    Browse the API using the built in HAL browser http://localhost:9000
-        HAL browser is not available in the Production deployment
-        Spring dev-tools are available in development mode only
+
 
 Production deployment
 --------------
