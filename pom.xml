@@ -177,7 +177,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.4.1</version>
+                    <version>2.6</version>
                     <configuration>
                         <!-- get all project dependencies -->
                         <descriptorRefs>
@@ -185,7 +185,6 @@
                         </descriptorRefs>
                         <!-- MainClass in mainfest make a executable jar -->
                         <archive>
-                            <addClasspath>true</addClasspath>
                             <manifest>
                                 <mainClass>com.seopa.tests.automated.test.cases.ExcelTestCase</mainClass>
                             </manifest>

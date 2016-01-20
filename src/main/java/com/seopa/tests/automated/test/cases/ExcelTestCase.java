@@ -3,6 +3,7 @@ package com.seopa.tests.automated.test.cases;
 import com.seopa.tests.automated.questions.ExcelQuestionList;
 import com.seopa.tests.automated.questions.Question;
 import org.apache.log4j.Logger;
+
 import java.util.List;
 
 /**
@@ -20,6 +21,17 @@ public class ExcelTestCase extends TestCase {
 
     private String excelFileName;
     private String address;
+
+    public static void main(String[] args) {
+        ExcelTestCase tc = new ExcelTestCase();
+        try {
+            boolean res = tc.execute(args[0], args[1]); //Firefox!
+        }
+        catch (Exception e) {
+            log.error("File not found!");
+        }
+
+    }
 
 
     /**
@@ -71,9 +83,5 @@ public class ExcelTestCase extends TestCase {
         return address;
     }
 
-    public static void main(String[] args) throws Exception {
-        ExcelTestCase tc = new ExcelTestCase();
-        boolean res = tc.execute(args[0], args[1]); //Firefox!
 
-    }
 }
