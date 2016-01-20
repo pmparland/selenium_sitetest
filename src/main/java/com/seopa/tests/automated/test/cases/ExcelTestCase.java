@@ -70,4 +70,10 @@ public class ExcelTestCase extends TestCase {
     protected String determineStartingAddress() {
         return address;
     }
+
+    public static void main(String[] args) throws Exception {
+        ExcelTestCase tc = new ExcelTestCase();
+        boolean res = tc.execute(args[0], args[1]); //Firefox!
+
+    }
 }
