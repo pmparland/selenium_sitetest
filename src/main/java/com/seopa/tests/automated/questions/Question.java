@@ -2,11 +2,18 @@ package com.seopa.tests.automated.questions;
 
 import lombok.Data;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 /**
  * Defines the set of data to answer a question.
@@ -172,7 +179,7 @@ public class Question {
                 if (locatorValue.equalsIgnoreCase("nextButton")){
                     //Wait longer for a page change
                     log.info(">>> Next page");
-                    page.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+                    page.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
                 }
                 break;
             case "select_by_value" :
@@ -211,7 +218,7 @@ public class Question {
     private void waitForElementToBeAvailable(WebDriver driver, By loc){
         //Wait for it to be visible
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-                .withTimeout(15, TimeUnit.SECONDS)
+                .withTimeout(30, TimeUnit.SECONDS)
                 .pollingEvery(500, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
         //Only one of these conditions will cause a wait but different elements have different properties
@@ -223,7 +230,7 @@ public class Question {
     private void waitForDropListToBeAvailable(WebDriver driver, Select sel){
         //Wait for the Select Drop values to be visible
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-                .withTimeout(10, TimeUnit.SECONDS)
+                .withTimeout(30, TimeUnit.SECONDS)
                 .pollingEvery(500, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
         wait.until(new ExpectedCondition<Object>() {
