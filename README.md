@@ -8,24 +8,23 @@ Development
 --------------
 
     Checkout the sources
-    Build and run using mvn clean install
+    Build and run using 
+        mvn clean install
 
 
 Production deployment
 --------------
 
-    Package as a WAR file using mvn clean package -P war-file
+    Create a fat jar and copy to the target machine
+        mvn clean compile assembly:single
 
-Production deployment as Docker Container
+
+Production execution
 --------------
+    java -jar target/sitetest-jar-with-dependencies.jar <excel file> <http address of site>
 
-    To package as a Docker container use mvn clean package docker:build
-
-    To use Chrome ensure that you Install Chrome Web Driver - https://code.google.com/p/selenium/wiki/ChromeDriver
-    To use IE ensure that you install the IE Web Driver - https://code.google.com/p/selenium/wiki/InternetExplorerDriver
-    By default Firefox is supported. This Firefox addon is extremely useful https://addons.mozilla.org/en-GB/firefox/addon/element-locator-for-webdriv/ 
-
-    Test can only be executed from a Seopa ip!
+    Currently defaults to use Firefox!
+    
 
 Who do I talk to?
 --------------
