@@ -177,9 +177,7 @@ public class Question {
                 scrollToElement(page, element);  //required if screen scrolls
                 element.click();
                 if (locatorValue.equalsIgnoreCase("nextButton")){
-                    //Wait longer for a page change
                     log.info(">>> Next page");
-                    page.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
                 }
                 break;
             case "select_by_value" :

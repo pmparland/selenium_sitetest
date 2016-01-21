@@ -2,13 +2,11 @@ package com.seopa.tests.automated.test.cases;
 
 import com.seopa.tests.automated.questions.Question;
 import lombok.Data;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -78,10 +76,8 @@ public abstract class TestCase {
 
         // Go to first question page
         WebDriver driver = createWebDriver();
+        driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS); //set page wait time
         driver.get(startingAddress);
-        // Wait for page to load
-        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-
 
         //Execute each question
         Optional<Question> questionOptional =
