@@ -24,6 +24,8 @@ Production execution
     java -jar target/sitetest-jar-with-dependencies.jar <excel file> <http address of site>
 
     Currently defaults to use Firefox!
+
+    Wiki page at: https://wiki.quotezone.co.uk/w/index.php/SiteTestTool 
     
 
 Who do I talk to?
